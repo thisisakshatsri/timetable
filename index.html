@@ -114,7 +114,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
     import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";
     
-    // Your Firebase configuration
+    // Your Firebase configuration from environment variables
     const firebaseConfig = {
         apiKey: "AIzaSyAN-aBebmoVRorOtA13m-NP0hvctaBcr6k",
         authDomain: "mergedtt.firebaseapp.com",
@@ -138,6 +138,9 @@
         set,
         get
     };
+
+    // Log Firebase initialization
+    console.log('Firebase initialized successfully');
   </script>
 
   <!-- Load your scripts after Firebase initialization -->

@@ -1,0 +1,16 @@
+{
+  "name": "timetable-app",
+  "version": "1.0.0",
+  "description": "Timetable Application",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel deploy --prod"
+  },
+  "dependencies": {
+    "firebase": "^11.2.0"
+  },
+  "devDependencies": {
+    "vercel": "latest"
+  }
+}

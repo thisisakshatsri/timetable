@@ -450,75 +450,46 @@ function captureTableScreenshot() {
     });
 }
 
-// Search functionality
+// Add this function to initialize search functionality
 function initializeSearch() {
     const searchInput = document.getElementById('search-input');
-    const clearButton = document.querySelector('.clear-search');
+    if (!searchInput) return;
 
-    if (!searchInput || !clearButton) {
-        console.error('Search elements not found');
-        return;
-    }
-
-    // Search event listener
     searchInput.addEventListener('input', function (e) {
         const searchTerm = e.target.value.toLowerCase().trim();
-
-        // Show/hide clear button
-        clearButton.style.display = searchTerm ? 'block' : 'none';
-
-        // Get all cells with content
-        const cells = document.querySelectorAll('#timetable td .editable');
+        const cells = document.querySelectorAll('#timetable td .cell-content');
         let foundMatch = false;
 
         cells.forEach(cell => {
-            const content = cell.value.toLowerCase();
-            const parentCell = cell.closest('td');
+            const cellContent = cell.innerText.toLowerCase();
+            const cellParent = cell.closest('td');
 
             if (searchTerm === '') {
                 // Reset styles if search is empty
-                parentCell.style.backgroundColor = '';
-                cell.style.opacity = '1';
-            } else if (content.includes(searchTerm)) {
-                // Highlight matches
-                parentCell.style.backgroundColor = '#fef3c7';
-                cell.style.opacity = '1';
+                cellParent.classList.remove('highlight-match');
+            } else if (cellContent.includes(searchTerm)) {
+                // Highlight matching cells
+                cellParent.classList.add('highlight-match');
                 foundMatch = true;
             } else {
-                // Dim non-matches
-                parentCell.style.backgroundColor = '';
-                cell.style.opacity = '0.3';
+                // Remove highlight from non-matching cells
+                cellParent.classList.remove('highlight-match');
             }
         });
 
-        // Update no results message
+        // Show/hide no results message
         updateNoResultsMessage(searchTerm, foundMatch);
-    });
-
-    // Clear button event listener
-    clearButton.addEventListener('click', function () {
-        searchInput.value = '';
-        clearButton.style.display = 'none';
-
-        // Reset all cells
-        document.querySelectorAll('#timetable td .editable').forEach(cell => {
-            const parentCell = cell.closest('td');
-            parentCell.style.backgroundColor = '';
-            cell.style.opacity = '1';
-        });
-
-        // Hide no results message
-        updateNoResultsMessage('', true);
     });
 }
 
+// Function to update the no results message
 function updateNoResultsMessage(searchTerm, foundMatch) {
     let messageElement = document.getElementById('no-results-message');
 
     if (!messageElement) {
         messageElement = document.createElement('div');
         messageElement.id = 'no-results-message';
-        messageElement.className = 'no-results';
+        messageElement.className = 'no-results-message';
         document.querySelector('.search-container').appendChild(messageElement);
     }
 

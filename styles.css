@@ -461,22 +461,74 @@ h1 {
 
 /* Search Box */
 .search-container {
-  margin: 20px 0;
+  position: relative;
+  width: 250px;
+  max-width: 100%;
 }
 
 .search-input {
   width: 100%;
-  padding: 12px 20px;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: all 0.3s ease;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  background-color: white;
 }
 
 .search-input:focus {
   outline: none;
   border-color: #6366f1;
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Highlight matching cells */
+.highlight-match {
+  background-color: rgba(255, 255, 0, 0.3) !important;
+  /* Light yellow highlight */
+  transition: background-color 0.2s ease;
+}
+
+/* Dim non-matching cells */
+.dim-cell {
+  opacity: 0.5;
+}
+
+/* No results message */
+.no-results-message {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  padding: 8px 12px;
+  background-color: #fee2e2;
+  color: #dc2626;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  display: none;
+  z-index: 10;
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .search-input {
+  background-color: #1f2937;
+  border-color: #374151;
+  color: #e5e7eb;
+}
+
+[data-theme="dark"] .search-input:focus {
+  border-color: #6366f1;
+}
+
+[data-theme="dark"] .highlight-match {
+  background-color: rgba(255, 255, 0, 0.2) !important;
+  /* Slightly dimmer highlight for dark mode */
+}
+
+[data-theme="dark"] .no-results-message {
+  background-color: #7f1d1d;
+  color: #fecaca;
 }
 
 /* Dark Mode Styles */
@@ -544,12 +596,6 @@ h1 {
   border-color: #374151;
 }
 
-[data-theme="dark"] .search-input {
-  background: #374151;
-  border-color: #4b5563;
-  color: #f3f4f6;
-}
-
 [data-theme="dark"] .search-input::placeholder {
   color: #9ca3af;
 }
@@ -605,13 +651,6 @@ h1 {
 .utility-buttons {
   display: flex;
   gap: 10px;
-}
-
-.search-container {
-  position: relative;
-  width: 300px;
-  max-width: 100%;
-  flex-shrink: 1;
 }
 
 .button-container {

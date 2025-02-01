@@ -125,6 +125,7 @@ h1 {
   padding: 8px;
   white-space: pre-wrap;
   word-wrap: break-word;
+  box-sizing: border-box;
 }
 
 /* Mobile improvements */
@@ -190,9 +191,6 @@ h1 {
 
 /* Ensure content is centered in cells */
 .cell-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   text-align: center;
 }
 

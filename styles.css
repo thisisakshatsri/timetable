@@ -35,9 +35,7 @@ body {
 
 .content-wrapper {
   position: relative;
-  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
   min-height: calc(100vh - 100px);
   display: flex;
   flex-direction: column;
@@ -48,9 +46,8 @@ body {
   border-radius: 12px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   padding: 20px;
-  margin-top: 24px;
   width: 100%;
-  max-width: 100%;
+  box-sizing: border-box;
   overflow-x: auto;
   border: 1px solid rgba(0, 0, 0, 0.1);
   -webkit-overflow-scrolling: touch;
@@ -97,7 +94,6 @@ h1 {
   position: sticky;
   left: 0;
   z-index: 10;
-  background: var(--bg-primary);
   font-weight: 600;
   box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
 }
@@ -318,10 +314,6 @@ h1 {
 
 /* Responsive improvements */
 @media (max-width: 1024px) {
-  .content-wrapper {
-    padding: 1rem;
-  }
-
   #timetable-container {
     padding: 12px;
     border-radius: var(--radius-sm);
@@ -1117,8 +1109,7 @@ textarea:not([readonly]) {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(0, 0, 0, 0.1);
   margin-bottom: 24px;
-  width: calc(100% - 40px);
-  /* Account for padding */
+  width: 100%;
   box-sizing: border-box;
 }
 

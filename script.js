@@ -89,25 +89,6 @@ function renderTimetable(data) {
     dayHeaderCell.textContent = "DAY";
     headerRow.appendChild(dayHeaderCell);
 
-    const periodHeaders = [
-        "I\n8:00-8:50",
-        "II\n8:55-9:45",
-        "III\n9:50-10:40",
-        "IV\n10:45-11:35",
-        "V\n11:40-12:30",
-        "VI\n12:35-1:25",
-        "VII\n2:30-3:20",
-        "VIII\n3:25-4:15",
-        "IX\n4:20-5:10"
-    ];
-
-    periodHeaders.forEach(header => {
-        const cell = document.createElement('td');
-        cell.textContent = header;
-        headerRow.appendChild(cell);
-    });
-
-    tbody.appendChild(headerRow);
 
     // Render data rows
     data.forEach((dayData, rowIndex) => {

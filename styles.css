@@ -35,25 +35,16 @@ body {
 
 .content-wrapper {
   position: relative;
-  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
   min-height: calc(100vh - 100px);
   display: flex;
   flex-direction: column;
 }
 
 #timetable-container {
-  background: var(--bg-primary);
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  padding: 20px;
-  margin-top: 24px;
   width: 100%;
-  max-width: 100%;
   overflow-x: auto;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  -webkit-overflow-scrolling: touch;
+  position: relative;
 }
 
 h1 {
@@ -74,36 +65,30 @@ h1 {
   border-collapse: separate;
   border-spacing: 0;
   min-width: 1000px;
-  max-width: 100%;
-  margin: 0;
   background: var(--bg-primary);
 }
 
-/* Cell styles */
-#timetable th,
-#timetable td {
-  min-width: 100px;
-  max-width: 150px;
+/* Regular cell styles */
+#timetable td,
+#timetable th {
   border: 1px solid #e5e7eb;
   padding: 16px;
-  transition: background-color 0.2s ease;
+  background: var(--bg-primary);
 }
 
-/* First column (DAY column) styles */
+/* Sticky first column */
 #timetable td:first-child,
 #timetable th:first-child {
-  width: 80px;
-  min-width: 80px;
   position: sticky;
   left: 0;
-  z-index: 10;
   background: var(--bg-primary);
-  font-weight: 600;
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+  min-width: 80px;
+  width: 80px;
+  z-index: 2;
 }
 
 /* Header styles */
-#timetable th {
+#timetable thead th {
   background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
   color: white;
   font-weight: 600;
@@ -112,10 +97,28 @@ h1 {
   line-height: 1.3;
   white-space: pre-line;
   padding: 12px 8px;
-  position: sticky;
-  top: 0;
-  z-index: 11;
-  height: auto;
+}
+
+/* First header cell (corner) */
+#timetable thead th:first-child {
+  z-index: 3;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+}
+
+/* Add a subtle border to separate sticky column */
+#timetable td:first-child,
+#timetable th:first-child {
+  border-right: 2px solid #e5e7eb;
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] #timetable td:first-child {
+  background: var(--bg-primary);
+  border-right-color: #374151;
+}
+
+[data-theme="dark"] #timetable th:first-child {
+  background: linear-gradient(135deg, #4338ca 0%, #5b21b6 100%);
 }
 
 /* Cell content styles */
@@ -126,21 +129,17 @@ h1 {
   white-space: pre-wrap;
   word-wrap: break-word;
   box-sizing: border-box;
+  text-align: center;
 }
 
 /* Mobile improvements */
 @media screen and (max-width: 768px) {
-  #timetable-container {
-    padding: 12px;
-  }
-
   #timetable {
     min-width: 800px;
-    /* Slightly reduced for better mobile handling */
   }
 
-  #timetable th,
-  #timetable td {
+  #timetable td,
+  #timetable th {
     padding: 12px 8px;
   }
 
@@ -171,10 +170,13 @@ h1 {
 }
 
 /* Dark mode adjustments */
-[data-theme="dark"] #timetable td:first-child,
-[data-theme="dark"] #timetable th:first-child {
+[data-theme="dark"] #timetable td:first-child {
   background: var(--bg-primary);
-  color: var(--text-primary);
+  border-right-color: #374151;
+}
+
+[data-theme="dark"] #timetable th:first-child {
+  background: linear-gradient(135deg, #4338ca 0%, #5b21b6 100%);
 }
 
 [data-theme="dark"] #timetable-container::-webkit-scrollbar-track {
@@ -225,16 +227,13 @@ h1 {
   color: white;
   font-weight: 600;
   text-transform: uppercase;
-  font-size: 0.9rem;
-  letter-spacing: 0.05em;
-  border: none;
-  padding: 12px 8px;
   font-size: 0.85rem;
   line-height: 1.3;
   white-space: pre-line;
+  padding: 12px 8px;
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 2;
 }
 
 #timetable th:first-child {
@@ -318,14 +317,6 @@ h1 {
 
 /* Responsive improvements */
 @media (max-width: 1024px) {
-  .content-wrapper {
-    padding: 1rem;
-  }
-
-  #timetable-container {
-    padding: 12px;
-    border-radius: var(--radius-sm);
-  }
 
   #timetable th,
   #timetable td {
@@ -718,13 +709,9 @@ h1 {
 }
 
 /* Table container */
-.timetable-container {
+#timetable-container {
   width: 100%;
   overflow-x: auto;
-  padding: 20px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  background: white;
   position: relative;
   z-index: 1;
 }
@@ -847,10 +834,6 @@ h1 {
 
 /* Responsive adjustments */
 @media screen and (max-width: 1024px) {
-  .timetable-container {
-    padding: 10px;
-  }
-
   #timetable {
     font-size: 13px;
   }
@@ -1117,8 +1100,7 @@ textarea:not([readonly]) {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(0, 0, 0, 0.1);
   margin-bottom: 24px;
-  width: calc(100% - 40px);
-  /* Account for padding */
+  width: 100%;
   box-sizing: border-box;
 }
 
@@ -1349,4 +1331,11 @@ textarea:not([readonly]) {
 .cell-content:focus {
   outline: 2px solid #007bff;
   border-color: transparent;
+}
+
+/* Remove any mask or gradient overlays */
+#timetable-container::after,
+#timetable td:first-child::after,
+#timetable th:first-child::after {
+  display: none;
 }

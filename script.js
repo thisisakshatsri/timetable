@@ -34,7 +34,7 @@ function initializeTimetable() {
 function updateCell(rowIndex, colIndex, value) {
     const { database, ref, set } = window.firebaseDB;
     const cellRef = ref(database, `timetable/${rowIndex}/periods/${colIndex}`);
-    
+
     set(cellRef, value)
         .then(() => {
             showNotification('Change saved');
@@ -66,13 +66,13 @@ function updateTimetableDisplay(data) {
 // Handle cell updates
 function handleCellUpdate(event) {
     if (!window.isEditMode) return;
-    
+
     const textarea = event.target;
     const cell = textarea.closest('td');
     const row = cell.closest('tr');
     const rowIndex = Array.from(row.parentNode.children).indexOf(row);
     const colIndex = Array.from(row.children).indexOf(cell);
-    
+
     updateCell(rowIndex, colIndex, textarea.value);
 }
 
@@ -112,9 +112,9 @@ function renderTimetable(data) {
     // Render data rows
     data.forEach((dayData, rowIndex) => {
         if (!dayData || !dayData.day) return;
-        
+
         const row = document.createElement('tr');
-        
+
         // Day cell
         const dayCell = document.createElement('td');
         const dayDiv = document.createElement('div');
@@ -132,11 +132,12 @@ function renderTimetable(data) {
                 const cell = document.createElement('td');
                 const div = document.createElement('div');
                 div.className = 'cell-content';
-                div.textContent = periodData || '';
+                div.innerText = periodData || '';
                 div.contentEditable = isEditMode;
                 div.dataset.rowIndex = rowIndex;
                 div.dataset.colIndex = colIndex;
                 div.dataset.type = 'period';
+                div.style.whiteSpace = 'pre-wrap';
                 cell.appendChild(div);
                 row.appendChild(cell);
             });
@@ -159,7 +160,7 @@ function handleCellEdit(event) {
     const textarea = event.target;
     const rowIndex = parseInt(textarea.dataset.rowIndex);
     const colIndex = parseInt(textarea.dataset.colIndex);
-    
+
     // Store the change in a temporary object
     if (!window.pendingChanges) {
         window.pendingChanges = {};
@@ -168,7 +169,7 @@ function handleCellEdit(event) {
         window.pendingChanges[rowIndex] = {};
     }
     window.pendingChanges[rowIndex][colIndex] = textarea.value;
-    
+
     // Adjust height of the textarea
     textarea.style.height = 'auto';
     textarea.style.height = textarea.scrollHeight + 'px';
@@ -178,7 +179,7 @@ function handleCellEdit(event) {
 function saveAllChanges() {
     const { database, ref, set } = window.firebaseDB;
     const timetableRef = ref(database, 'timetable');
-    
+
     // Get the header data
     const headerData = {
         day: "DAY",
@@ -202,11 +203,11 @@ function saveAllChanges() {
     rows.forEach(row => {
         const dayCellContent = row.querySelector('.cell-content[data-type="day"]');
         const periodCells = row.querySelectorAll('.cell-content[data-type="period"]');
-        
+
         if (dayCellContent) {
             const dayData = {
-                day: dayCellContent.textContent.trim(),
-                periods: Array.from(periodCells).map(cell => cell.textContent.trim())
+                day: dayCellContent.innerText.trim(),
+                periods: Array.from(periodCells).map(cell => cell.innerText)
             };
             updatedData.push(dayData);
         }
@@ -219,10 +220,10 @@ function saveAllChanges() {
         .then(() => {
             console.log('Data saved successfully');
             showNotification('Changes saved successfully!');
-            
+
             // Update the display immediately
             renderTimetable(updatedData.slice(1));
-            
+
             // Exit edit mode after successful save
             toggleEditMode();
         })
@@ -236,7 +237,7 @@ function saveAllChanges() {
 function checkPassword() {
     const password = "Qwerty1234";
     const userInput = prompt("Please enter password to edit:");
-    
+
     if (userInput === password) {
         return true;
     } else if (userInput !== null) { // If user clicked OK but wrong password
@@ -253,16 +254,16 @@ function toggleEditMode() {
             return; // Don't enable edit mode if password is incorrect
         }
     }
-    
+
     isEditMode = !isEditMode;
-    
+
     document.querySelectorAll('.cell-content').forEach(div => {
         div.contentEditable = isEditMode;
     });
 
     const editBtn = document.getElementById('edit-btn');
     const saveBtn = document.getElementById('save-btn');
-    
+
     if (editBtn && saveBtn) {
         editBtn.style.display = isEditMode ? 'none' : 'inline-block';
         saveBtn.style.display = isEditMode ? 'inline-block' : 'none';
@@ -274,7 +275,7 @@ function toggleEditMode() {
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     initializeTimetable();
-    
+
     const saveBtn = document.getElementById('save-btn');
     if (saveBtn) {
         saveBtn.addEventListener('click', saveAllChanges);
@@ -306,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize theme toggle
     initializeThemeToggle();
-    
+
     // Check system preference
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     if (prefersDark && !localStorage.getItem('theme')) {
@@ -317,12 +318,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize drag and drop
     initializeDragAndDrop();
-    
+
     // Re-initialize after any content changes
     const observer = new MutationObserver(() => {
         initializeDragAndDrop();
     });
-    
+
     observer.observe(document.getElementById('timetable'), {
         childList: true,
         subtree: true
@@ -335,9 +336,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const scrollTop = textarea.scrollTop;
                 const scrollHeight = textarea.scrollHeight;
                 const height = textarea.clientHeight;
-                
+
                 // Allow scrolling if there's more content
-                if ((e.deltaY < 0 && scrollTop > 0) || 
+                if ((e.deltaY < 0 && scrollTop > 0) ||
                     (e.deltaY > 0 && scrollTop < scrollHeight - height)) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -414,7 +415,7 @@ function resetToDefaultData() {
 function captureTableScreenshot() {
     // Get the timetable container
     const timetableContainer = document.getElementById('timetable-container');
-    
+
     // Show loading notification
     showNotification('Preparing screenshot...');
 
@@ -443,17 +444,17 @@ function captureTableScreenshot() {
         try {
             // Convert to image
             const image = canvas.toDataURL('image/png', 1.0);
-            
+
             // Create download link
             const downloadLink = document.createElement('a');
             downloadLink.href = image;
             downloadLink.download = `timetable_${new Date().toISOString().split('T')[0]}.png`;
-            
+
             // Trigger download
             document.body.appendChild(downloadLink);
             downloadLink.click();
             document.body.removeChild(downloadLink);
-            
+
             // Cleanup
             document.body.removeChild(clone);
             showNotification('Screenshot saved successfully!');
@@ -479,12 +480,12 @@ function initializeSearch() {
     }
 
     // Search event listener
-    searchInput.addEventListener('input', function(e) {
+    searchInput.addEventListener('input', function (e) {
         const searchTerm = e.target.value.toLowerCase().trim();
-        
+
         // Show/hide clear button
         clearButton.style.display = searchTerm ? 'block' : 'none';
-        
+
         // Get all cells with content
         const cells = document.querySelectorAll('#timetable td .editable');
         let foundMatch = false;
@@ -492,7 +493,7 @@ function initializeSearch() {
         cells.forEach(cell => {
             const content = cell.value.toLowerCase();
             const parentCell = cell.closest('td');
-            
+
             if (searchTerm === '') {
                 // Reset styles if search is empty
                 parentCell.style.backgroundColor = '';
@@ -514,17 +515,17 @@ function initializeSearch() {
     });
 
     // Clear button event listener
-    clearButton.addEventListener('click', function() {
+    clearButton.addEventListener('click', function () {
         searchInput.value = '';
         clearButton.style.display = 'none';
-        
+
         // Reset all cells
         document.querySelectorAll('#timetable td .editable').forEach(cell => {
             const parentCell = cell.closest('td');
             parentCell.style.backgroundColor = '';
             cell.style.opacity = '1';
         });
-        
+
         // Hide no results message
         updateNoResultsMessage('', true);
     });
@@ -532,7 +533,7 @@ function initializeSearch() {
 
 function updateNoResultsMessage(searchTerm, foundMatch) {
     let messageElement = document.getElementById('no-results-message');
-    
+
     if (!messageElement) {
         messageElement = document.createElement('div');
         messageElement.id = 'no-results-message';
@@ -557,7 +558,7 @@ function initializeThemeToggle() {
         themeToggle.id = 'theme-toggle';
         themeToggle.className = 'action-btn theme-toggle';
         themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-        
+
         // Add to button container
         const buttonContainer = document.querySelector('.button-container');
         if (buttonContainer) {
@@ -574,12 +575,12 @@ function initializeThemeToggle() {
     themeToggle.addEventListener('click', () => {
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
+
         // Update theme
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
         updateThemeIcon(newTheme);
-        
+
         // Show notification
         utils.showNotification(`Switched to ${newTheme} mode`);
     });
@@ -589,8 +590,8 @@ function initializeThemeToggle() {
 function updateThemeIcon(theme) {
     const themeToggle = document.getElementById('theme-toggle');
     if (themeToggle) {
-        themeToggle.innerHTML = theme === 'dark' 
-            ? '<i class="fas fa-sun"></i>' 
+        themeToggle.innerHTML = theme === 'dark'
+            ? '<i class="fas fa-sun"></i>'
             : '<i class="fas fa-moon"></i>';
         themeToggle.setAttribute('aria-label', `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`);
     }
@@ -611,14 +612,14 @@ function initializeDragAndDrop() {
 
     textareas.forEach(textarea => {
         // Enable dragging
-        textarea.addEventListener('mousedown', function(e) {
+        textarea.addEventListener('mousedown', function (e) {
             if (!isEditMode) return;
             draggedTextarea = this;
             this.classList.add('dragging');
         });
 
         // Handle drag over
-        textarea.addEventListener('mouseover', function(e) {
+        textarea.addEventListener('mouseover', function (e) {
             if (!isEditMode || !draggedTextarea) return;
             if (this !== draggedTextarea) {
                 this.classList.add('drag-over');
@@ -626,15 +627,15 @@ function initializeDragAndDrop() {
         });
 
         // Handle drag leave
-        textarea.addEventListener('mouseout', function(e) {
+        textarea.addEventListener('mouseout', function (e) {
             if (!isEditMode) return;
             this.classList.remove('drag-over');
         });
 
         // Handle drop
-        textarea.addEventListener('mouseup', function(e) {
+        textarea.addEventListener('mouseup', function (e) {
             if (!isEditMode || !draggedTextarea) return;
-            
+
             if (this !== draggedTextarea) {
                 // Swap content
                 const tempValue = this.value;
@@ -652,7 +653,7 @@ function initializeDragAndDrop() {
     });
 
     // Clean up if mouse is released outside of any textarea
-    document.addEventListener('mouseup', function() {
+    document.addEventListener('mouseup', function () {
         if (draggedTextarea) {
             textareas.forEach(ta => {
                 ta.classList.remove('dragging');

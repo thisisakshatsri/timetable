@@ -1,6 +1,4 @@
 // Add this at the top of data.js
-console.log('Data file loaded successfully');
-
 const timetableData = [
     {
         day: "Monday",
@@ -93,16 +91,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (window.firebaseDB) {
         const { database, ref, get, set } = window.firebaseDB;
         const timetableRef = ref(database, 'timetable');
-        
+
         try {
             // Check if data exists
             const snapshot = await get(timetableRef);
             if (!snapshot.exists()) {
                 // Only set initial data if database is empty
                 await set(timetableRef, timetableData);
-                console.log('Initial timetable data uploaded successfully');
-            } else {
-                console.log('Database already contains data, skipping initialization');
             }
         } catch (error) {
             console.error('Error checking/setting initial data:', error);
@@ -114,6 +109,3 @@ document.addEventListener('DOMContentLoaded', async () => {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { timetableData };
 }
-
-// Log data loading
-console.log('Timetable data loaded successfully'); 

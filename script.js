@@ -7,11 +7,6 @@ const editBtn = document.getElementById('edit-btn');
 const saveBtn = document.getElementById('save-btn');
 const exportBtn = document.getElementById('export-btn');
 
-// Debug function to check data
-function logCurrentData() {
-    console.log('Current localStorage data:', utils.getStoredData());
-}
-
 // Function to initialize and sync timetable data
 function initializeTimetable() {
     const { database, ref, onValue } = window.firebaseDB;
@@ -21,8 +16,7 @@ function initializeTimetable() {
     onValue(timetableRef, (snapshot) => {
         const data = snapshot.val();
         if (data && Array.isArray(data)) {
-            console.log('Received data from Firebase:', data);
-            renderTimetable(data.slice(1));
+            renderTimetable(data);
         }
     }, (error) => {
         console.error('Database sync error:', error);
@@ -82,13 +76,6 @@ function renderTimetable(data) {
     if (!tbody) return;
 
     tbody.innerHTML = '';
-
-    // Create header row
-    const headerRow = document.createElement('tr');
-    const dayHeaderCell = document.createElement('td');
-    dayHeaderCell.textContent = "DAY";
-    headerRow.appendChild(dayHeaderCell);
-
 
     // Render data rows
     data.forEach((dayData, rowIndex) => {
@@ -194,12 +181,9 @@ function saveAllChanges() {
         }
     });
 
-    console.log('Saving updated data:', updatedData);
-
     // Save to Firebase
     set(timetableRef, updatedData)
         .then(() => {
-            console.log('Data saved successfully');
             showNotification('Changes saved successfully!');
 
             // Update the display immediately
@@ -279,11 +263,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof html2canvas === 'undefined') {
         console.error('html2canvas not loaded');
         utils.showNotification('Screenshot feature not available', 'error');
-    } else {
-        console.log('html2canvas loaded successfully');
     }
 
-    console.log('Initializing search functionality');
     initializeSearch();
 
     // Initialize theme toggle

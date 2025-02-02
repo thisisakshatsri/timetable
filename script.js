@@ -148,24 +148,8 @@ function saveAllChanges() {
     const { database, ref, set } = window.firebaseDB;
     const timetableRef = ref(database, 'timetable');
 
-    // Get the header data
-    const headerData = {
-        day: "DAY",
-        periods: [
-            "I\n8:00-8:50",
-            "II\n8:55-9:45",
-            "III\n9:50-10:40",
-            "IV\n10:45-11:35",
-            "V\n11:40-12:30",
-            "VI\n12:35-1:25",
-            "VII\n2:30-3:20",
-            "VIII\n3:25-4:15",
-            "IX\n4:20-5:10"
-        ]
-    };
-
     // Collect all data from the table
-    const updatedData = [headerData];
+    const updatedData = [];
     const rows = Array.from(document.querySelectorAll('#timetable-body tr'));
 
     rows.forEach(row => {
@@ -186,7 +170,7 @@ function saveAllChanges() {
         .then(() => {
             showNotification('Changes saved successfully!');
 
-            // Update the display immediately
+            // Update the display with only the data rows
             renderTimetable(updatedData);
 
             // Exit edit mode after successful save

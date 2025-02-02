@@ -165,7 +165,7 @@ function saveAllChanges() {
     };
 
     // Collect all data from the table
-    const updatedData = [headerData];
+    // const updatedData = [headerData];
     const rows = Array.from(document.querySelectorAll('#timetable-body tr'));
 
     rows.forEach(row => {

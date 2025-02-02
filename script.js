@@ -166,7 +166,7 @@ function saveAllChanges() {
 
     // Collect all data from the table
     const updatedData = [headerData];
-    const rows = Array.from(document.querySelectorAll('#timetable-body tr')).slice(1);
+    const rows = Array.from(document.querySelectorAll('#timetable-body tr'));
 
     rows.forEach(row => {
         const dayCellContent = row.querySelector('.cell-content[data-type="day"]');
@@ -187,7 +187,7 @@ function saveAllChanges() {
             showNotification('Changes saved successfully!');
 
             // Update the display immediately
-            renderTimetable(updatedData.slice(1));
+            renderTimetable(updatedData);
 
             // Exit edit mode after successful save
             toggleEditMode();

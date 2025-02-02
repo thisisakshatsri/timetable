@@ -187,7 +187,7 @@ function saveAllChanges() {
             showNotification('Changes saved successfully!');
 
             // Update the display immediately
-            renderTimetable(updatedData);
+            renderTimetable(updatedData.slice(1));
 
             // Exit edit mode after successful save
             toggleEditMode();

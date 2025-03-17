@@ -359,60 +359,55 @@ function resetToDefaultData() {
 
 // Add this function for better screenshot handling
 function captureTableScreenshot() {
-    // Get the timetable container
     const timetableContainer = document.getElementById('timetable-container');
-
-    // Show loading notification
-    showNotification('Preparing screenshot...');
-
-    // Create a clone of the table for capturing
+    
+    // Create a clone with full dimensions
     const clone = timetableContainer.cloneNode(true);
     clone.style.position = 'absolute';
     clone.style.left = '-9999px';
-    clone.style.width = timetableContainer.offsetWidth + 'px';
+    
+    // Set clone dimensions to full scrollable width
+    clone.style.width = `${timetableContainer.scrollWidth}px`;
+    clone.style.overflow = 'visible';
+    clone.style.height = 'auto';
+    
+    // Remove horizontal scrollbar from clone
+    clone.style.overflowX = 'hidden';
+    
     document.body.appendChild(clone);
 
-    // Configure html2canvas options
-    const options = {
-        scale: 2, // Higher resolution
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: document.documentElement.getAttribute('data-theme') === 'dark' ? '#1f2937' : '#ffffff',
-        logging: false,
-        width: timetableContainer.offsetWidth,
-        height: timetableContainer.offsetHeight,
-        scrollX: 0,
-        scrollY: 0
-    };
-
-    // Capture the screenshot
-    html2canvas(clone, options).then(canvas => {
-        try {
-            // Convert to image
-            const image = canvas.toDataURL('image/png', 1.0);
-
-            // Create download link
-            const downloadLink = document.createElement('a');
-            downloadLink.href = image;
-            downloadLink.download = `timetable_${new Date().toISOString().split('T')[0]}.png`;
-
-            // Trigger download
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
-
-            // Cleanup
+    // Wait for clone to render
+    setTimeout(() => {
+        html2canvas(clone, {
+            scale: 2,
+            scrollX: -window.scrollX,
+            scrollY: -window.scrollY,
+            windowWidth: clone.scrollWidth,
+            windowHeight: clone.scrollHeight,
+            useCORS: true,
+            allowTaint: true,
+            logging: false,
+            backgroundColor: document.documentElement.getAttribute('data-theme') === 'dark' ? '#1f2937' : '#ffffff'
+        }).then(canvas => {
+            try {
+                const image = canvas.toDataURL('image/png');
+                const downloadLink = document.createElement('a');
+                downloadLink.href = image;
+                downloadLink.download = `timetable_${new Date().toISOString().split('T')[0]}.png`;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                showNotification('Full timetable exported!');
+            } catch (error) {
+                console.error('Export failed:', error);
+                showNotification('Export failed. Please try again.', 'error');
+            }
             document.body.removeChild(clone);
-            showNotification('Screenshot saved successfully!');
-        } catch (error) {
-            console.error('Screenshot generation failed:', error);
-            showNotification('Failed to generate screenshot. Please try again.');
-        }
-    }).catch(error => {
-        console.error('Screenshot capture failed:', error);
-        showNotification('Failed to capture screenshot. Please try again.');
-        document.body.removeChild(clone);
-    });
+        }).catch(error => {
+            console.error('Capture failed:', error);
+            document.body.removeChild(clone);
+        });
+    }, 500); // Increased timeout for rendering
 }
 
 // Add this function to initialize search functionality
@@ -580,3 +575,85 @@ function initializeDragAndDrop() {
         }
     });
 }
+function exportToWord() {
+    const timetable = document.getElementById('timetable').cloneNode(true);
+    
+    // Process cells to maintain exact line breaks
+    timetable.querySelectorAll('td, th').forEach(cell => {
+        // Convert newlines to Word-compatible line breaks
+        const content = cell.innerText;
+        cell.innerHTML = content.replace(/\n/g ,'<w:br/>') // Word-specific line breaks
+                               .replace(/\n/g ,'<br>');    // Fallback for other apps
+        
+        // Add Word-specific styling
+        cell.setAttribute('style', 
+            'border: 1pt solid #4f46e5; ' +
+            'padding: 4pt; ' +
+            'vertical-align: top; ' +
+            'mso-height-source: userset; ' + // Word height control
+            'height: auto !important;' +
+            'white-space: pre-wrap;' // Preserve whitespace
+        );
+    });
+
+    // Create Word-specific XML structure
+    const html = `
+        <html xmlns:w="urn:schemas-microsoft-com:office:word"
+              xmlns:o="urn:schemas-microsoft-com:office:office">
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                table {
+                    border-collapse: collapse;
+                    width: 100%;
+                    font-family: Arial, sans-serif;
+                    font-size: 11pt;
+                    mso-border-alt: solid #4f46e5 1.0pt; /* Word borders */
+                }
+                th {
+                    background: #4f46e5;
+                    color: white;
+                    padding: 8pt;
+                    mso-pattern: auto none; /* Word shading */
+                }
+                td:first-child {
+                    background: #f8fafc;
+                    font-weight: 600;
+                    mso-pattern: auto none;
+                }
+            </style>
+        </head>
+        <body>
+            <h1 style="color: #4f46e5; text-align: center;">
+                Timetable<br/>
+                <span style="font-size: 12pt; color: #666;">
+                    ${new Date().toLocaleDateString('en-IN', { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    })}
+                </span>
+            </h1>
+            ${timetable.outerHTML
+                .replace(/<td/g, '<td style="mso-height-source:userset; height:auto;"')
+                .replace(/<table/g, '<table align="center"')}
+        </body>
+        </html>
+    `;
+
+    // Create and trigger download
+    const blob = new Blob([html], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Timetable_${new Date().toISOString().split('T')[0]}.doc`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showNotification('Word document generated with perfect formatting!');
+}
+// Add to DOMContentLoaded event
+document.getElementById('word-export').addEventListener('click', exportToWord);

@@ -1378,3 +1378,16 @@ textarea:not([readonly]) {
 #timetable th:first-child::after {
   display: none;
 }
+/* Word Export Button */
+#word-export {
+  background: linear-gradient(135deg, #2b579a 0%, #1b366f 100%);
+  color: white;
+}
+
+#word-export:hover {
+  background: linear-gradient(135deg, #1b366f 0%, #2b579a 100%);
+}
+
+.fa-file-word {
+  margin-right: 8px;
+}
